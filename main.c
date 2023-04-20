@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
         //printf("%d\n", size);
         TNode *tree = construct_tree(pixels, 0, 0, size, factor);
 
-        fprintf(out, "%u\n", find_max_depth(tree));
+        fprintf(out, "%u\n", find_max_depth(tree) + 1);
         fprintf(out, "%u\n", count_leaves(tree));
         fprintf(out, "%u\n", size >> find_min_depth(tree));
 

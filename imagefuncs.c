@@ -54,15 +54,15 @@ void destroy_q(TQueue **q) {
 
 
 TPixel compute_mean(TPixel **pixels, int l, int c, int size) {
-    double mr, mg, mb;
+    unsigned int mr, mg, mb;
     mr = mg = mb = 0;
     
     int i, j;
     for (i = l; i < l + size; i++) {
         for (j = c; j < c + size; j++) {
-            mr += (double)(pixels[i][j].r);
-            mg += (double)(pixels[i][j].g);
-            mb += (double)(pixels[i][j].b);
+            mr += (pixels[i][j].r);
+            mg += (pixels[i][j].g);
+            mb += (pixels[i][j].b);
         }
     }
 
@@ -75,14 +75,14 @@ TPixel compute_mean(TPixel **pixels, int l, int c, int size) {
 }
 
 double compute_similarity(TPixel **pixels, int l, int c, int size, TPixel mean) {
-    double similarity = 0;
+    unsigned int similarity = 0;
     
     int i, j;
     for (i = l; i < l + size; i++) {
         for (j = c; j < c + size; j++) {
-            double difr = (double)mean.r - (double)pixels[i][j].r;
-            double difg = (double)mean.g - (double)pixels[i][j].g;
-            double difb = (double)mean.b - (double)pixels[i][j].b;
+            unsigned int difr = mean.r - pixels[i][j].r;
+            unsigned int difg = mean.g - pixels[i][j].g;
+            unsigned int difb = mean.b - pixels[i][j].b;
             //printf("%lf %lf %lf\n", difr, difg, difb);
             similarity += difr * difr;
             similarity += difg * difg;
