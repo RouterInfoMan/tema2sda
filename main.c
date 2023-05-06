@@ -1,3 +1,4 @@
+/*ROTARU Razvan-Andrei 315CB*/
 #include "imagefuncs.h"
 #include <stdio.h>
 #include <string.h>
@@ -12,8 +13,8 @@ int main(int argc, char *argv[]) {
         return -1;
     }
     if (strcmp(argv[1], "-c1") == 0) {
-        double factor;
-        sscanf(argv[2], "%lf", &factor);
+        unsigned long long factor;
+        sscanf(argv[2], "%llu", &factor);
 
         FILE *in = fopen(argv[3], "rb");
         FILE *out = fopen(argv[4], "wb");
@@ -21,10 +22,10 @@ int main(int argc, char *argv[]) {
         if (!in || !out) {
             return -1;
         }
-        
+
         unsigned int size;
         TPixel **pixels = get_pixels(in, &size);
-        //printf("%d\n", size);
+
         TNode *tree = construct_tree(pixels, 0, 0, size, factor);
 
         fprintf(out, "%u\n", find_max_depth(tree) + 1);
@@ -35,12 +36,11 @@ int main(int argc, char *argv[]) {
         delete_pixels(pixels, size);
 
         fclose(in);
-        fclose(out);             
-
+        fclose(out);
     }
     if (strcmp(argv[1], "-c2") == 0) {
-        double factor;
-        sscanf(argv[2], "%lf", &factor);
+        unsigned long long factor;
+        sscanf(argv[2], "%llu", &factor);
 
         FILE *in = fopen(argv[3], "rb");
         FILE *out = fopen(argv[4], "wb");
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
         unsigned int size;
         TPixel **pixels = get_pixels(in, &size);
-        //printf("%d\n", size);
+
         TNode *tree = construct_tree(pixels, 0, 0, size, factor);
 
         fwrite(&size, sizeof(unsigned int), 1, out);
@@ -84,4 +84,5 @@ int main(int argc, char *argv[]) {
         fclose(in);
         fclose(out);
     }
+    return 0;
 }

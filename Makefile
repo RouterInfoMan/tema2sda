@@ -1,6 +1,6 @@
 CFLAGS = -g -Wall
 
-all: main.o imagefuncs.o
+build: main.o imagefuncs.o
 	gcc -o quadtree main.o imagefuncs.o $(CFLAGS)
 
 main.o: main.c
@@ -8,6 +8,9 @@ main.o: main.c
 
 imagefuncs.o: imagefuncs.c
 	gcc -c imagefuncs.c $(CFLAGS)
+
+zip: imagefuncs.c main.c imagefuncs.h README Makefile README
+	zip tema2sda.zip imagefuncs.c main.c imagefuncs.h README Makefile README
 
 clean:
 	rm *.o quadtree

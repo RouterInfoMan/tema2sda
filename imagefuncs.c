@@ -1,12 +1,13 @@
+/*ROTARU Razvan-Andrei 315CB*/
 #include "imagefuncs.h"
 
 const TPixel NULL_PIXEL = {0, 0, 0};
 
 QNode *alloc_QNode(void *data) {
-   QNode *node = malloc(sizeof(QNode));
-   node->data = data;
-   node->next = NULL; 
-   return node;
+    QNode *node = malloc(sizeof(QNode));
+    node->data = data;
+    node->next = NULL;
+    return node;
 }
 void *delete_QNode(QNode **nod) {
     void *aux = (*nod)->data;
@@ -21,7 +22,7 @@ TQueue *init_Q() {
 }
 void push_q(TQueue *q, void *data) {
     QNode *nod = alloc_QNode(data);
-    if(q->front == q->back && q->front == NULL) {
+    if (q->front == q->back && q->front == NULL) {
         q->front = q->back = nod;
     } else {
         q->back->next = nod;
@@ -29,7 +30,7 @@ void push_q(TQueue *q, void *data) {
     }
 }
 void *pop_q(TQueue *q) {
-    if(q->front == NULL) {
+    if (q->front == NULL) {
         return NULL;
     } else {
         QNode *aux = q->front;
@@ -41,7 +42,7 @@ void *pop_q(TQueue *q) {
     }
 }
 void destroy_q(TQueue **q) {
-    while((*q)->front) {
+    while ((*q)->front) {
         QNode *aux = (*q)->front;
         (*q)->front = (*q)->front->next;
         delete_QNode(&aux);
@@ -54,15 +55,15 @@ void destroy_q(TQueue **q) {
 
 
 TPixel compute_mean(TPixel **pixels, int l, int c, int size) {
-    unsigned int mr, mg, mb;
+    __int64_t mr, mg, mb;
     mr = mg = mb = 0;
-    
+
     int i, j;
     for (i = l; i < l + size; i++) {
         for (j = c; j < c + size; j++) {
-            mr += (pixels[i][j].r);
-            mg += (pixels[i][j].g);
-            mb += (pixels[i][j].b);
+            mr += (unsigned int)(pixels[i][j].r);
+            mg += (unsigned int)(pixels[i][j].g);
+            mb += (unsigned int)(pixels[i][j].b);
         }
     }
 
@@ -74,16 +75,16 @@ TPixel compute_mean(TPixel **pixels, int l, int c, int size) {
     return mean;
 }
 
-double compute_similarity(TPixel **pixels, int l, int c, int size, TPixel mean) {
-    unsigned int similarity = 0;
+__int64_t compute_similarity(TPixel **pixels, int l, int c, int size, TPixel mean) {
+    __int64_t similarity = 0;
     
     int i, j;
     for (i = l; i < l + size; i++) {
         for (j = c; j < c + size; j++) {
-            unsigned int difr = mean.r - pixels[i][j].r;
-            unsigned int difg = mean.g - pixels[i][j].g;
-            unsigned int difb = mean.b - pixels[i][j].b;
-            //printf("%lf %lf %lf\n", difr, difg, difb);
+            int difr = (int)mean.r - (int)pixels[i][j].r;
+            int difg = (int)mean.g - (int)pixels[i][j].g;
+            int difb = (int)mean.b - (int)pixels[i][j].b;
+
             similarity += difr * difr;
             similarity += difg * difg;
             similarity += difb * difb;
@@ -104,15 +105,16 @@ TNode *alloc_TNode(int type, TPixel pixel) {
     }
     return nod;
 }
-TNode *construct_tree(TPixel **pixels, int l, int c, int size, double prag) {
-    if(size == 1) { 
+TNode *construct_tree(TPixel **pixels, int l, int c, int size, __uint64_t prag) {
+    if (size == 1) {
         return alloc_TNode(1, pixels[l][c]);
     }
-    
+
     TPixel mean = compute_mean(pixels, l, c, size);
-    double similarity = compute_similarity(pixels, l, c, size, mean);
-    
+    __int64_t similarity = compute_similarity(pixels, l, c, size, mean);
     TNode *nod;
+
+
     if (similarity <= prag) {
         nod = alloc_TNode(1, mean);
     } else {
@@ -137,30 +139,13 @@ void delete_tree(TNode *node) {
 }
 void binary_print_tree(FILE *out_file, TNode *node) {
     TQueue *q = init_Q();
-    
+
     push_q(q, node);
-    
-    QNode *level_end = q->back;
+
     TNode *current;
-    int level = 0;
-    
-    while(q->front) {
-        while(q->front != level_end) {
-            current = pop_q(q);
-            if (current->type == 0) {
-                fputc(0, out_file);
-                int i;
-                for (i = 0; i < NR_FII; i++) {
-                    push_q(q, current->next[i]);
-                }
-            } else {
-                fputc(1               , out_file);
-                fputc(current->pixel.r, out_file);
-                fputc(current->pixel.g, out_file);
-                fputc(current->pixel.b, out_file);
-            }
-        }
-        current = pop_q(q); 
+
+    while (q->front) {
+        current = pop_q(q);
         if (current->type == 0) {
             fputc(0, out_file);
             int i;
@@ -173,71 +158,15 @@ void binary_print_tree(FILE *out_file, TNode *node) {
             fputc(current->pixel.g, out_file);
             fputc(current->pixel.b, out_file);
         }
-        //fprintf(out_file, "\n");
-        level_end = q->back;
-        level++;
     }
     destroy_q(&q);
-}
-void human_readable_print_tree(FILE *out_file, TNode *node) {
-    
-    TQueue *q = init_Q();
-    
-    push_q(q, node);
-    
-    QNode *level_end = q->back;
-    TNode *current;
-    int level = 0;
-    
-    while(q->front) {
-        while(q->front != level_end) {
-            current = pop_q(q);
-            if (current->type == 0) {
-                fprintf(out_file, "0 ");
-                int i;
-                for (i = 0; i < NR_FII; i++) {
-                    push_q(q, current->next[i]);
-                }
-            } else {
-                fprintf(out_file, "{1 %d %d %d} ", current->pixel.r, current->pixel.g, current->pixel.b);
-            }
-        }
-        current = pop_q(q); 
-        if (current->type == 0) {
-            fprintf(out_file, "0 ");
-            int i;
-            for (i = 0; i < NR_FII; i++) {
-                push_q(q, current->next[i]);
-            }
-        } else {
-            fprintf(out_file, "{1 %d %d %d} ", current->pixel.r, current->pixel.g, current->pixel.b);
-        }
-        fprintf(out_file, "\n");
-        level_end = q->back;
-        level++;
-    }
-    destroy_q(&q);
-}
-void basic_tree_print(TNode *node) {
-    if (!node) {
-        return;
-    }
-    if (node->type == 0) {
-        printf("0\n");
-        int i;
-        for (i = 0; i < NR_FII; i++) {
-            basic_tree_print(node->next[i]);
-        }
-    } else {
-        printf("{1 %d %d %d}\n", node->pixel.r, node->pixel.g, node->pixel.b);
-    }
 }
 TPixel **get_pixels(FILE *ppm_in, unsigned int *size) {
     char dump[256];
     unsigned int width, height;
     int max_value;
 
-    fgets(dump, 256, ppm_in); //antet
+    fgets(dump, 256, ppm_in);  // antet
     fscanf(ppm_in, "%u %u", &width, &height);
     fscanf(ppm_in, "%d", &max_value);
 
@@ -246,13 +175,13 @@ TPixel **get_pixels(FILE *ppm_in, unsigned int *size) {
     }
     *size = width;
     fgetc(ppm_in);
-    //fgets(dump, 256, ppm_in);
+
 
     TPixel **img =(TPixel **) malloc(sizeof(TPixel *) * *size);
     int i, j;
     for (i = 0; i < *size; i++) {
         img[i] = malloc(sizeof(TPixel) * *size);
-    } 
+    }
     for (i = 0; i < *size; i++) {
         for (j = 0; j < *size; j++) {
             fread(&(img[i][j].r), sizeof(unsigned char), 1, ppm_in);
@@ -260,8 +189,6 @@ TPixel **get_pixels(FILE *ppm_in, unsigned int *size) {
             fread(&(img[i][j].b), sizeof(unsigned char), 1, ppm_in);
         }
     }
-
-    //printf("%hhu %hhu %hhu\n", img[128][0].r, img[128][0].g, img[128][0].b);
     return img;
 }
 TNode *get_tree(FILE *ppm_compressed, unsigned int *size) {

@@ -1,3 +1,4 @@
+/*ROTARU Razvan-Andrei 315CB*/
 #pragma once
 #include <stdio.h>
 #include <string.h>
@@ -29,9 +30,7 @@ typedef struct {
 TPixel **get_pixels(FILE *ppm_in, unsigned int *size);
 
 
-TNode *construct_tree(TPixel **pixels, int l, int c, int size, double prag);
-void basic_tree_print(TNode *node);
-void human_readable_print_tree(FILE *out_file, TNode *node);
+TNode *construct_tree(TPixel **pixels, int l, int c, int size, __uint64_t prag);
 void binary_print_tree(FILE *out_file, TNode *node);
 void delete_tree(TNode *node);
 void delete_pixels(TPixel **pixels, unsigned int size);
